@@ -1,5 +1,5 @@
 ---
-title: "Austraits"
+title: "AusTraits"
 format: html
 editor_options: 
   chunk_output_type: console
@@ -7,20 +7,145 @@ editor_options:
 
 # Introduction & Goals
 
-# Loading data
+(daniel)
+- Introduce AusTraits as an example of a big data
+- Refresh and practice skills in data manipulation and sumamrising
+- learn some fancy tricks: nests, joins, 
 
+https://doi.org/10.1038/s41597-021-01006-6
+
+
+# Setup 
+
+## Accessing AusTraits
 
 https://zenodo.org/record/7583087/files/austraits-4.1.0.rds?download=1
 
+save to downloads folder in this project
+
+## Loading data
+
+Use function `readRDS` to read in the data
+
+```{r}
+austraits <- readRDS("downloads/austraits-4.1.0.rds")
+```
+
+## Packages
+(daniel)
+To analyse, goingto use the tidyverse package
+
+- links about tidyvesre
+
+# Exploring the data
+(daniel)
+AusTraits object is a list
+
+## Dictionary
+
+Data structure described in dictionary
+
+What is???
+
+## Lists and  Tables (tibbles)
+
+```{r}
+names(austraits)
+```
+
+Access elements withins
+
+```{r}
+austraits[["traits"]]
+```
+
+Most parts are tables (tibbles)
+
+Challenge: 
+
+How many rows in each of these tables XXXX:
+
 ```{r}
 
 ```
 
-You can add options to executable code like this 
+
+## Working with tables
+
+Chance to practice working with and summarising data
+
+dplyr functions
+
+- filter
+- select
+- mutate
+- summarise
+- group_by
+
+Challenges
+
+1. How many taxa and traits are included?
 
 ```{r}
-#| echo: false
-2 * 2
+
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+Answer: 
+
+2. From taxa table, how many accepted species?
+
+```{r}
+
+```
+
+Answer: 
+
+
+2. How many trait records per taxa? Arrange taxa from most to least. What are top 5 taxa?
+
+```{r}
+
+```
+
+Answer: 
+
+3. 
+
+xx
+
+
+
+
+## Make plots with ggplot
+
+Basic ggplot formulas
+
+```{r}
+
+```
+
+Challenges
+
+Plot XXX
+```{r}
+
+```
+
+Recreate Figure 2a.
+
+```{r}
+
+```
+
+
+
+## Nest
+
+
+
+## Pivot wider
+
+
+## Joining tables
+
+
