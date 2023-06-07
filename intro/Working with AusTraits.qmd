@@ -238,14 +238,31 @@ Aussies <- filter(grepl('Australia', austraits$contributors$affiliation))
 Answer:
 
 
-10. What kinds of records are there, are they from literature, lab, specimen, etc?
+10. What kinds of records are there, are they from literature, a lab, a specimen collection, etc?
 
 ```{r}
 unique(austraits$traits$basis_of_record)
 ```
 
-Answer.
+Answer. There should be 12 types of record
 
+
+11.
+
+```{r}
+
+```
+
+Answer:
+
+
+12.
+
+```{r}
+
+```
+
+Answer:
 
 
 ## Make plots with ggplot
@@ -279,10 +296,63 @@ wood_density %>%
 
 2. Recreate Figure 2a. from the Austraits paper (https://doi.org/10.1038/s41597-021-01006-6)
 
-We want to plot the coverage of traits by taxa. This figure shows the coverage of taxa for each trait, yellow representing the presence of data, from a subset of 500 randomly selected taxa.
+We want to plot the coverage of traits by taxa, i.e. for how many traits are data provided across the different taxa? This figure shows the coverage of taxa for each trait, yellow representing the presence of data, from a subset of 500 randomly selected taxa.
 
 ```{r}
+# Austraits: site locations plot
 
+# 1: Get climate data for Australia
+# Download bioclim data using library(raster):
+library(raster)
+
+# one strategy for retrieving data available on web
+filename <- "data/australia.tif"
+
+# Read bioclim data using raster package
+au_map <- raster::raster(filename) %>%
+  aggregate(fact=6) %>%
+  raster::as.data.frame(xy = T)
+
+# 2: Plot Australia basemap
+ggplot() +
+  geom_raster(data = au_map, aes(
+    x = x,
+    y = y,
+    fill = factor(australia)
+  )) +
+  myTheme -> au_basemap
+
+
+# 3. Overlay site locations
+
+austraits_site_locations_by_tissue_fig_2 <- 
+  sites %>%
+  select(site_name, `latitude (deg)`, `longitude (deg)`, `tissue`) %>%
+  filter(
+    `latitude (deg)` > (-45),
+    `latitude (deg)` < (-9.5),
+    `longitude (deg)` < (153),
+    `longitude (deg)` > (110)
+  ) %>%
+  filter(
+    !site_name %in% c(
+      "site_at_-17.4167_degS_and_151.8833_degE",
+      "site_at_-16.5833_degS_and_150.3167_degE",
+      "site_at_-16.9333_degS_and_149.1833_degE",
+      "site_at_-16.9833_degS_and_149.8833_degE"
+    )
+  ) %>%
+  drop_na() %>%
+  produce_site_map("latitude (deg)", "longitude (deg)", feature = "tissue") +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    strip.background = element_blank(),
+    strip.text.x = element_text(size = 12),
+    legend.key.height = unit(0.5, "cm"),
+    legend.key.width = unit(2, "cm"),
+    legend.box = "horizontal" #,
+  )
 ```
 
 
