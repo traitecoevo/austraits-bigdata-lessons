@@ -82,26 +82,42 @@ With your partner, answer the following questions:
 
 ```
 
+
 ## Lists and  Tables (tibbles)
 
+A list is simply that, an ordered list of any combination of items, such as integers, character strings, vectors, or even a list of lists! 
+
 ```{r}
+typeof(austraits)
 names(austraits)
+length(austraits)
 ```
 
-Access elements withins
+You can access elements within the list
 
 ```{r}
 austraits[["traits"]]
+
+austraits[["traits"]][["trait_name"]]
+
+# alternatively:
+
+austraits$traits$trait_name
+
+austraits[["traits"]][4]
 ```
 
-Most parts are tables (tibbles)
+Most parts are tables (a.k.a. tibbles)
+
 
 Challenge: 
 
-How many rows in each of these tables XXXX:
+How many rows in each of these tables: taxa, contributors & locations
 
 ```{r}
-
+nrow(austraits$locations)
+nrow(austraits$contributors)
+nrow(austraits$taxa)
 ```
 
 
@@ -109,7 +125,7 @@ How many rows in each of these tables XXXX:
 
 Chance to practice working with and summarising data
 
-dplyr functions
+Common dplyr functions include:
 
 - filter
 - select
@@ -117,17 +133,58 @@ dplyr functions
 - summarise
 - group_by
 
+
 Challenges
+
 
 1. How many taxa and traits are included?
 
 ```{r}
+length(unique(austraits$traits$trait_name))
+length(austraits$taxa$taxon_name)
+```
+
+Answer: taxa: 34017, traits: 464
+
+Note: nrow() doesn't work here! Why not? (hint: use the typeof() function)
+
+
+2. From the taxa table, how many accepted species are there?
+
+```{r}
+austraits$taxa$taxonomic_status %>% 
+  filter(taxonomic_status == "") %>% length()
+```
+
+Answer: 
+
+
+3. How many trait records in the top 5 recorded taxa?
+
+```{r}
+austraits %>% group_by(traits$trait_name) %>%
+  sort(traits$value, decreasing = TRUE)
+
+austraits %>% group_by(traits$trait_name) %>% nrow(traits$observation_id)
 
 ```
 
 Answer: 
 
-2. From taxa table, how many accepted species?
+
+4. What is the range of values in these 3 traits: flower_colour, seed_N_per_seed_dry_mass, leaf_dry_mass
+
+```{r}
+austraits <- austraits$traits %>% tibble(trait_name, value, unit, taxon_name) 
+#%>% filter(trait_name == "flower_colour")
+
+
+```
+
+Answer: 
+
+
+5. what proportion of traits have integer (not character) values?
 
 ```{r}
 
@@ -136,18 +193,56 @@ Answer:
 Answer: 
 
 
-2. How many trait records per taxa? Arrange taxa from most to least. What are top 5 taxa?
+6. What traits were excluded from the dataset?
+
+```{r}
+unique(austraits$excluded_data$trait_name)
+```
+
+Answer: 
+
+
+7. Let's have a look at the wood_density trait, made a new data frame object and isolate this trait and the taxon_name, trait_name, value and unit columns
+
+```{r}
+wood_density <- austraits$traits %>% 
+  filter(trait_name == "wood_density") %>% 
+  select(trait_name, value, taxon_name)
+```
+
+Answer: 
+
+
+8. Now make a column converting wood density into kg, and determine the max, min and mean values
+
+```{r}
+wood_density <- wood_density %>% 
+  mutate(wood_density_kg = as.integer(value)*1E06)
+
+wood_density$wood_density_kg %>% max()
+wood_density$wood_density_kg %>% min()
+wood_density$wood_density_kg %>% mean()
+```
+
+Answer: 
+
+
+9.
 
 ```{r}
 
 ```
 
-Answer: 
+Answer:
 
-3. 
 
-xx
+10.
 
+```{r}
+
+```
+
+Answer.
 
 
 
