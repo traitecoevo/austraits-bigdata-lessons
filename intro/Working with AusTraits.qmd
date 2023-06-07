@@ -10,30 +10,22 @@ editor_options:
 The two goals of this prpactical are to:
 
 1. Get hands on experience with AusTraits, as an example of a big-data resource on traits of biolgocial organisms
-2. Refresh, extend and practice your skills in data manipulation and visulaisation 
-3. Learn some fancy tricks when working wioth tables of data: joining relational tables and nesting tables
+2. Refresh, extend, and practice your skills in data manipulation and visualisation 
+3. Learn some fancy tricks when working with tables of data: joining relational tables, pvotting tables, and nesting tables
 
-As background, I suggest reading the paper describing AusTraits:
+As background, we suggest reading the paper describing AusTraits:
 
 - Falster et al 2021 <https://doi.org/10.1038/s41597-021-01006-6>
 - The AusTraits data dictionary, available as a download at https://zenodo.org/record/7583087 (see the file [dictionary.html](https://zenodo.org/record/7583087/files/dictionary.html?download=1))
 
 # Setup 
 
-We will be using R and Rstudio for this practical, with the packages `tidyverse` and `austraits` installed. 
+We will be using R and Rstudio for this practical, with the packages `tidyverse` and `austraits` installed. To install the packages (if you don't already have them installed), run the following code in the console:
 
-To install `tidyverse` (if you don't already have it installed), run the following code in the console:
-
-```{r, eval=FALSE}
-install.packages("tidyverse")
-```
-
-
-To install `austraits` run the following code in the console:
-
-```{r, eval=FALSE}
-devtools::install_github("traitecoevo/austraits")
-
+```{r}
+# Uncomment the next lines as needed
+# install.packages("tidyverse")
+# devtools::install_github("traitecoevo/austraits")
 ```
 
 After installing, load the packages
@@ -45,26 +37,27 @@ library(austraits)
 
 ## Accessing AusTraits
 
-You can access the data in either of two ways:
+You can access the data from AusTraits in either of two ways:
 
-
-1. Use the package austraits
+1. Use the package [austraits](https://github.com/traitecoevo/austraits) to download the data directly from the web. This is the easiest way to get started.
 
 ```{r}
 austraits <- load_austraits(version = "4.1.0", path = "intro/downloads")
 ```
 
-2. Download the data to your computer from <https://zenodo.org/record/7583087/files/austraits-4.1.0.rds?download=1> and save it in the folder `downloads` in this project, then read it in using
+2. Manually download the data to your computer from <https://zenodo.org/record/7583087/files/austraits-4.1.0.rds?download=1> and save it in the folder `downloads` in this project, then read it in using
 
 ```{r}
 austraits <- readRDS("intro/downloads/austraits-4.1.0.rds")
 ```
 
+We've designed AusTraits as a fully open resources, meaning anyone can directly access the data. However, we do ask that you cite the paper describing AusTraits in any publications that use the data.
+
 # Exploring the data
 
-In any analysis, you first eed to investigate the sturcture of the dataset.
+In any analysis, you first need to investigate the structure of the dataset.
 
-With your partner, answer the following questions:
+Working with a partner or small group, answer the following questions:
 
 (hint - the dictionary will also be useful here)
 
@@ -86,7 +79,7 @@ With your partner, answer the following questions:
 
 ## Lists and  Tables (tibbles)
 
-A list is simply that, an ordered list of any combination of items, such as integers, character strings, vectors, or even a list of lists! 
+A list is simply that, an ordered list of any combination of items, such as integers, character strings, vectors, tables,or even a list of lists! 
 
 ```{r}
 typeof(austraits)
@@ -102,16 +95,13 @@ austraits[["traits"]]
 austraits[["traits"]][["trait_name"]]
 
 # alternatively:
-
+austraits$traits
 austraits$traits$trait_name
-
-austraits[["traits"]][4]
 ```
 
-Most parts are tables (a.k.a. tibbles)
+Most elements of the AusTraits objects are tables (a.k.a. tibbles in R).
 
-
-Challenge: 
+Challenge:
 
 How many rows in each of these tables: taxa, contributors & locations
 
