@@ -148,7 +148,7 @@ taxa_status <- austraits$taxa %>% select(taxonomic_status, taxon_name)
 taxa_status %>% filter(taxonomic_status == "accepted") %>% nrow()
 ```
 
-Answer: 
+Answer: 33197
 
 
 3. How many trait records in the top 5 recorded taxa?
@@ -156,36 +156,40 @@ Answer:
 ```{r}
 trait_records <- austraits$traits %>% 
   group_by(trait_name) %>%
-  select(trait_name, value, observation_id)
+  select(trait_name, value, observation_id) %>%
+  na.omit()
 
-arrange?
+map(trait_records$value, ~sum(unique(.x)))
 ```
 
 Answer: 
 
 
-4. What is the range of values in these 3 traits: flower_colour, seed_N_per_seed_dry_mass, leaf_dry_mass
+4. What is the range of values in these 2 traits: seed_N_per_seed_dry_mass, leaf_dry_mass, flower_colour
 
 ```{r}
-austraits_subset <- austraits$traits %>% select(trait_name, value, unit, taxon_name)
+seeds <- austraits$traits %>% filter(trait_name == "seed_N_per_seed_dry_mass") %>% select(trait_name, value, taxon_name, unit)
+range(as.numeric(seeds$value))
 
-austraits_subset %>% filter(trait_name == "flower_colour") %>% unique(value)
-
-austraits_subset %>% filter(trait_name == "seed_N_per_seed_dry_mass") %>% range(value)
-
-austraits_subset %>% filter(trait_name == "leaf_dry_mass") %>% range(value)
+leaves <- austraits$traits %>% filter(trait_name == "leaf_dry_mass") %>% select(trait_name, value, taxon_name, unit) %>% na.omit()
+range(as.numeric(leaves$value))
 ```
 
-Answer: 
+Answer: seeds = 28.80 - 125.51 mg/g, leaves = 0.1 - 10538.0 mg
 
 
-5. what proportion of traits have numeric (not character) values?
+5. What proportion of flower bearing taxons contain green flowers? 
 
 ```{r}
+flowers <- austraits$traits %>% 
+  filter(trait_name == "flower_colour") %>% 
+  select(trait_name, value, taxon_name)
 
+nrow(flowers)
+flowers %>% filter(grepl('green', value)) %>% nrow()
 ```
 
-Answer: 
+Answer: 16.4%
 
 
 6. What traits were excluded from the dataset?
@@ -222,10 +226,10 @@ wood_density$wood_density_kg %>% mean()
 Answer: 
 
 
-9. How many contributors from Australian institutions? (too hard?) Top contributor?
+9. How many contributors from Australian institutions?
 
 ```{r}
-
+Aussies <- filter(grepl('Australia', austraits$contributors$affiliation))
 ```
 
 Answer:
@@ -235,7 +239,6 @@ Answer:
 
 ```{r}
 unique(austraits$traits$basis_of_record)
-
 ```
 
 Answer.
