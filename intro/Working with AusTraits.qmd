@@ -229,13 +229,18 @@ wood_density$wood_density_kg %>% mean()
 Answer: min = 57.1kg, max = 1260kg, mean = 608.6kg
 
 
-9. How many contributors are from Australian institutions?
+9. How many Austraits contributors are from Australian institutions?
 
 ```{r}
-Aussies <- filter(grepl('Australia', austraits$contributors$affiliation))
+Aussies <- tibble(affiliation = austraits$contributors$affiliation)
+nrow(Aussies)
+
+Aussies %>% filter(grepl('Australia|Australian', affiliation)) %>% nrow()
 ```
 
-Answer:
+Answer: 491 (out of 606)
+
+Note: In this and other cases, you can't simply filter directly on "austraits$contributors$affiliation" -- this object would just be a long list of character strings, and what we want is a data frame or tibble like what you are familiar with, with rows and columns that can be filtered and selected for using dplyr
 
 
 10. What kinds of records are there, are they from literature, a lab, a specimen collection, etc?
@@ -299,6 +304,10 @@ wood_density %>%
 We want to plot the coverage of traits by taxa, i.e. for how many traits are data provided across the different taxa? This figure shows the coverage of taxa for each trait, yellow representing the presence of data, from a subset of 500 randomly selected taxa.
 
 ```{r}
+#use sf?
+#install.packages("sf")
+#library(sf)
+
 # Austraits: site locations plot
 
 # 1: Get climate data for Australia
