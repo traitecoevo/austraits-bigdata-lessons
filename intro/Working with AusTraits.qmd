@@ -7,45 +7,80 @@ editor_options:
 
 # Introduction & Goals
 
-(daniel)
-- Introduce AusTraits as an example of a big data
-- Refresh and practice skills in data manipulation and sumamrising
-- learn some fancy tricks: nests, joins, 
+The two goals of this prpactical are to:
 
-https://doi.org/10.1038/s41597-021-01006-6
+1. Get hands on experience with AusTraits, as an example of a big-data resource on traits of biolgocial organisms
+2. Refresh, extend and practice your skills in data manipulation and visulaisation 
+3. Learn some fancy tricks when working wioth tables of data: joining relational tables and nesting tables
 
+As background, I suggest reading the paper describing AusTraits:
+
+- Falster et al 2021 <https://doi.org/10.1038/s41597-021-01006-6>
+- The AusTraits data dictionary, available as a download at https://zenodo.org/record/7583087 (see the file [dictionary.html](https://zenodo.org/record/7583087/files/dictionary.html?download=1))
 
 # Setup 
 
+We will be using R and Rstudio for this practical, with the packages `tidyverse` and `austraits` installed. 
+
+To install `tidyverse` (if you don't already have it installed), run the following code in the console:
+
+```{r, eval=FALSE}
+install.packages("tidyverse")
+```
+
+
+To install `austraits` run the following code in the console:
+
+```{r, eval=FALSE}
+devtools::install_github("traitecoevo/austraits")
+```
+
+After installing, load the packages
+
+```{r}
+library(tidyverse)
+library(austraits)
+```
+
 ## Accessing AusTraits
 
-https://zenodo.org/record/7583087/files/austraits-4.1.0.rds?download=1
+You can access the data in either of two ways:
 
-save to downloads folder in this project
 
-## Loading data
+1. Use the package austraits
 
-Use function `readRDS` to read in the data
+```{r}
+austraits <- load_austraits(version = "4.1.0", path = "downloads")
+```
+
+2. Download the data to your computer from <https://zenodo.org/record/7583087/files/austraits-4.1.0.rds?download=1> and save it in the folder `downloads` in this project, then read it in using
 
 ```{r}
 austraits <- readRDS("downloads/austraits-4.1.0.rds")
 ```
 
-## Packages
-(daniel)
-To analyse, goingto use the tidyverse package
-
-- links about tidyvesre
-
 # Exploring the data
-(daniel)
-AusTraits object is a list
 
-## Dictionary
+In any analysis, you first eed to investigate the sturcture of the dataset.
 
-Data structure described in dictionary
+With your partner, answer the following questions:
 
-What is???
+(hint - the dictionary will also be useful here)
+
+1. What is the class of the object `austraits`?
+```{r}
+
+```
+
+2. What are the names of the elements in `austraits`?
+```{r}
+
+```
+
+3. What's in all the different elements of `austraits`?
+```{r}
+
+```
 
 ## Lists and  Tables (tibbles)
 
@@ -139,13 +174,95 @@ Recreate Figure 2a.
 
 
 
-## Nest
+# Some fancy tricks
 
+If you've mastered the basics, here are some more advanced tricks to try out. 
 
+## Joining tables
+
+The traits table has a column `taxon_name` that links to the `taxon_name` column in the `taxa` table. This is an example of a relational database, where tables are linked by a common column. 
+
+We can use the `left_join` function to join the two tables together. 
+
+```{r}
+austraits_joined <- left_join(austraits[["traits"]], austraits[["taxa"]], by = "taxon_name")
+```
+
+Challenge:
+
+1. How many rows and columns are in the original and joined table?
+
+```{r}
+
+```
+
+2. Why would you join the tables together?
+
+```{r}
+
+```
+
+3. Can you see how to join other tables to the traits table?
+
+```{r}
+
+```
+
+## Nesting tables
+
+Nests embed tables within tables. Yes, that's right. 
+
+The nest function comes from the `tidyr` package. It takes a table and a column name (.e.g. `dataset_id`), and creates a new column that contains a table, with one row for each value of the column `dataset_id`. 
+
+```{r}
+austraits_nested <- austraits$traits %>% nest(data = -dataset_id)
+
+austraits_nested
+```
+
+You can access the nested table using the `data` column, e.g.
+```{r}
+austraits_nested$data[[1]]
+austraits_nested$data[[2]]
+```
+
+You can then unnest using the `unnest` function, e.g.
+```{r}
+austraits_nested %>% unnest(cols = c(data))
+```
+
+Questions: 
+
+1. How many rows and columns are in the original and nested table?
+
+2. Why would you want to nest a dataframe?
 
 ## Pivot wider
 
+Large databsses often come in `long format`, where each row is a single observation x trait combination. However, for some analyses, it is useful to have the data in `wide format`, where each row conatains all the traits for a single .
 
-## Joining tables
+The `pivot_wider` function from the `tidyr` package allows you to reshape a dataset from long to wide format. Let's try it out. For this exercise let's use a subset of the data, e.g. the data with id `Falster_2005_1` (check out the paper here <https://doi.org/10.1111/j.0022-0477.2005.00992.x>) 
+
+Challenge: Use the filter function to create a subset of the traits column with only the data from the paper `Falster_2005_1`. Also remove the records with trait_name of `huber_value` as it contains some dome duplicate reocrds which make pivotting harder.
+
+```{r}
+data <- austraits$traits %>% 
+  filter(dataset_id == "Falster_2005_1", trait_name != "huber_value")
+```
+
+Now let's pivot the data from long to wide format. 
+
+```{r}
+data %>% 
+  select(taxon_name, trait_name, value) %>% 
+  pivot_wider(names_from = trait_name, values_from = value)
+```
+
+Questions:
+
+1. How many rows and columns are in the original and nested table?
+
+2. Why would you want to nest a dataframe?
+
 
 
