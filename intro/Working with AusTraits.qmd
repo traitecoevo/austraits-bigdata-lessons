@@ -140,7 +140,7 @@ Answer: taxa: 34017, traits: 464
 Note: nrow() doesn't work here! Why not? (hint: use the typeof() function)
 
 
-2. From the taxa table, how many accepted species are there?
+2. From the taxa table, how many accepted taxa are there?
 
 ```{r}
 taxa_status <- austraits$taxa %>% select(taxonomic_status, taxon_name)
@@ -158,7 +158,7 @@ trait_records <- austraits$traits %>%
   group_by(trait_name) %>%
   select(trait_name, value, observation_id)
 
-trait_records %>% sort()
+arrange?
 ```
 
 Answer: 
@@ -179,7 +179,7 @@ austraits_subset %>% filter(trait_name == "leaf_dry_mass") %>% range(value)
 Answer: 
 
 
-5. what proportion of traits have integer (not character) values?
+5. what proportion of traits have numeric (not character) values?
 
 ```{r}
 
@@ -212,7 +212,7 @@ Answer:
 
 ```{r}
 wood_density <- wood_density %>% 
-  mutate(wood_density_kg = as.integer(value)*1E06)
+  mutate(wood_density_kg = as.numeric(value)*1E06, count = row_number())
 
 wood_density$wood_density_kg %>% max()
 wood_density$wood_density_kg %>% min()
@@ -255,7 +255,8 @@ data %>%
   xlab() +
   ylab() +
   ggtitle() +
-  theme_classic()
+  theme_classic() +
+  ...
 ```
 
 
@@ -264,9 +265,10 @@ Challenges
 1. Plot values for wood density above
 ```{r}
 wood_density %>%
-  ggplot(aes(as.integer(value))) +
-  geom_histogram(bins = 10, binwidth = ) +
-  theme_classic()
+  ggplot(aes(as.numeric(value))) + 
+  geom_histogram(binwidth = 0.03) + 
+  xlab("Wood Density " ~ (kg/m^3)) +
+  theme_classic(base_size = 17)
 ```
 
 2. Recreate Figure 2a. from the Austraits paper (https://doi.org/10.1038/s41597-021-01006-6)
@@ -347,7 +349,7 @@ Large databsses often come in `long format`, where each row is a single observat
 
 The `pivot_wider` function from the `tidyr` package allows you to reshape a dataset from long to wide format. Let's try it out. For this exercise let's use a subset of the data, e.g. the data with id `Falster_2005_1` (check out the paper here <https://doi.org/10.1111/j.0022-0477.2005.00992.x>) 
 
-Challenge: Use the filter function to create a subset of the traits column with only the data from the paper `Falster_2005_1`. Also remove the records with trait_name of `huber_value` as it contains some dome duplicate reocrds which make pivotting harder.
+Challenge: Use the filter function to create a subset of the traits column with only the data from the paper `Falster_2005_1`. Also remove the records with trait_name of `huber_value` as it contains some dome duplicate records which make pivotting harder.
 
 ```{r}
 data <- austraits$traits %>% 
