@@ -202,7 +202,7 @@ Answer:
 ```{r}
 wood_density <- austraits$traits %>% 
   filter(trait_name == "wood_density") %>% 
-  select(trait_name, value, taxon_name)
+  select(taxon_name, trait_name, value, unit)
 ```
 
 Answer: 
@@ -212,7 +212,7 @@ Answer:
 
 ```{r}
 wood_density <- wood_density %>% 
-  mutate(wood_density_kg = as.numeric(value)*1E06, count = row_number())
+  mutate(wood_density_kg = as.numeric(value)*1E03, count = row_number())
 
 wood_density$wood_density_kg %>% max()
 wood_density$wood_density_kg %>% min()
