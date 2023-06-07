@@ -123,6 +123,7 @@ Common dplyr functions include:
 - mutate
 - summarise
 - group_by
+- grepl
 
 
 Challenges
@@ -178,7 +179,7 @@ range(as.numeric(leaves$value))
 Answer: seeds = 28.80 - 125.51 mg/g, leaves = 0.1 - 10538.0 mg
 
 
-5. What proportion of flower bearing taxons contain green flowers? 
+5. What proportion of flower bearing taxon contain green flowers? 
 
 ```{r}
 flowers <- austraits$traits %>% 
@@ -198,18 +199,20 @@ Answer: 16.4%
 unique(austraits$excluded_data$trait_name)
 ```
 
-Answer: 
+Answer: There should be 187
 
 
-7. Let's have a look at the wood_density trait, made a new data frame object and isolate this trait and the taxon_name, trait_name, value and unit columns
+7. Let's have a look at the wood_density trait, made a new data frame object and isolate this trait and the taxon_name, trait_name, value and unit columns. How many taxa are there?
 
 ```{r}
 wood_density <- austraits$traits %>% 
   filter(trait_name == "wood_density") %>% 
   select(taxon_name, trait_name, value, unit)
+
+length(unique(wood_density$taxon_name))
 ```
 
-Answer: 
+Answer: 1984
 
 
 8. Now make a column converting wood density into kg, and determine the max, min and mean values
@@ -223,10 +226,10 @@ wood_density$wood_density_kg %>% min()
 wood_density$wood_density_kg %>% mean()
 ```
 
-Answer: 
+Answer: min = 57.1kg, max = 1260kg, mean = 608.6kg
 
 
-9. How many contributors from Australian institutions?
+9. How many contributors are from Australian institutions?
 
 ```{r}
 Aussies <- filter(grepl('Australia', austraits$contributors$affiliation))
@@ -252,9 +255,9 @@ Basic ggplot formulas
 - we need to pass in the data, the x and y variables, the plot type, axes labels (with units!) and sometimes scales, title and any other aesthetics to make the plot easier to interpret and help to get the result across (e.g. colour scheme, faceting)
 
 ```{r}
-data %>%
+your.data %>%
   ggplot(aes(xvar, yvar)) +
-  geom_point() +
+  geom_plot.type() +
   xlab() +
   ylab() +
   ggtitle() +
@@ -265,7 +268,7 @@ data %>%
 
 Challenges
 
-1. Plot values for wood density above
+1. Plot the values for wood density from the object you created in Q7
 ```{r}
 wood_density %>%
   ggplot(aes(as.numeric(value))) + 
