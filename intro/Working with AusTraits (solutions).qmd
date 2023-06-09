@@ -117,8 +117,9 @@ Challenge:
 How many rows in each of these tables: taxa, contributors & locations
 
 ```{r}
-
-
+nrow(austraits$locations)
+nrow(austraits$contributors)
+nrow(austraits$taxa)
 ```
 
 
@@ -141,8 +142,9 @@ Challenges
 1. How many taxa and traits are included in this version of AusTraits?
 
 ```{r}
-
-
+length(unique(austraits$taxa$taxon_name))
+typeof(austraits$traits$trait_name)
+sort(unique(austraits$traits$trait_name))
 ```
 
 Answer: taxa: 34017, traits: 464
@@ -153,7 +155,9 @@ Note: nrow() doesn't work here! Why not? (hint: use the typeof() function)
 2. From the taxa table, how many accepted taxa are there?
 
 ```{r}
+taxa_status <- austraits$taxa %>% select(taxonomic_status, taxon_name)
 
+taxa_status %>% filter(taxonomic_status == "accepted") %>% nrow()
 ```
 
 Answer: 33197
@@ -162,8 +166,13 @@ Answer: 33197
 3. How many trait records in the top 5 recorded taxa?
 
 ```{r}
+taxa_records_count <- austraits$traits %>%
+  dplyr::select(taxon_name, value, observation_id, unit) %>%
+  group_by(taxon_name) %>% 
+  summarise(total_records = sum(as.numeric(observation_id)),
+            .groups = 'drop')
 
-
+taxa_records_count %>% arrange(desc(as.numeric(total_records)))
 ```
 
 Answer: 
@@ -172,8 +181,11 @@ Answer:
 4. What is the range of values in these 2 traits: seed_N_per_seed_dry_mass, leaf_dry_mass, flower_colour
 
 ```{r}
+seeds <- austraits$traits %>% filter(trait_name == "seed_N_per_seed_dry_mass") %>% select(trait_name, value, taxon_name, unit)
+range(as.numeric(seeds$value))
 
-
+leaves <- austraits$traits %>% filter(trait_name == "leaf_dry_mass") %>% select(trait_name, value, taxon_name, unit) %>% na.omit()
+range(as.numeric(leaves$value))
 ```
 
 Answer: seeds = 28.80 - 125.51 mg/g, leaves = 0.1 - 10538.0 mg
@@ -182,9 +194,12 @@ Answer: seeds = 28.80 - 125.51 mg/g, leaves = 0.1 - 10538.0 mg
 5. What proportion of flower bearing taxa contain green flowers? 
 
 ```{r}
+flowers <- austraits$traits %>% 
+  filter(trait_name == "flower_colour") %>% 
+  select(trait_name, value, taxon_name)
 
-
-
+nrow(flowers)
+flowers %>% filter(grepl('green', value)) %>% nrow()
 ```
 
 Answer: 16.4%
@@ -193,8 +208,7 @@ Answer: 16.4%
 6. How many traits have some records that were excluded from the dataset?
 
 ```{r}
-
-
+unique(austraits$excluded_data$trait_name)
 ```
 
 Answer: There should be 187
@@ -203,8 +217,11 @@ Answer: There should be 187
 7. Let's have a look at the wood_density trait, made a new data frame object and isolate this trait and the taxon_name, trait_name, value and unit columns. How many taxa are there?
 
 ```{r}
+wood_density <- austraits$traits %>% 
+  filter(trait_name == "wood_density") %>% 
+  select(taxon_name, trait_name, value, unit)
 
-
+length(unique(wood_density$taxon_name))
 ```
 
 Answer: 1984
@@ -213,8 +230,12 @@ Answer: 1984
 8. Now make a column converting wood density into kg, and determine the max, min and mean values
 
 ```{r}
+wood_density <- wood_density %>% 
+  mutate(wood_density_kg = as.numeric(value)*1E03, count = row_number())
 
-
+wood_density$wood_density_kg %>% max()
+wood_density$wood_density_kg %>% min()
+wood_density$wood_density_kg %>% mean()
 ```
 
 Answer: min = 57.1kg, max = 1260kg, mean = 608.6kg
@@ -223,20 +244,21 @@ Answer: min = 57.1kg, max = 1260kg, mean = 608.6kg
 9. How many Austraits contributors are from Australian institutions?
 
 ```{r}
+Aussies <- tibble(affiliation = austraits$contributors$affiliation)
+nrow(Aussies)
 
-
+Aussies %>% filter(grepl('Australia|Australian', affiliation)) %>% nrow()
 ```
 
 Answer: 491 (out of 606)
 
-Note: In this and other cases, you can't simply filter directly on "austraits$contributors$affiliation" -- this object would be of character type, basically a long sequence of character "strings", and what we want is a structured dataframe or tibble like what you are familiar with, with rows and columns that can be filtered and selected for easily using dplyr functions
+Note: In this and other cases, you can't simply filter directly on "austraits$contributors$affiliation" -- this object would just be a long list of character strings, and what we want is a data frame or tibble like what you are familiar with, with rows and columns that can be filtered and selected for using dplyr
 
 
 10. What kinds of records are there, are they from literature, a lab, a specimen collection, etc?
 
 ```{r}
-
-
+unique(austraits$traits$basis_of_record)
 ```
 
 Answer. There should be 12 types of record
@@ -266,9 +288,11 @@ Challenges
 1. Plot the values for wood density from the object you created in Q7
 
 ```{r}
-
-
-
+wood_density %>%
+  ggplot(aes(as.numeric(value))) + 
+  geom_histogram(binwidth = 0.03) + 
+  xlab("Wood Density " ~ (kg/m^3)) +
+  theme_classic(base_size = 17)
 ```
 
 2. Recreate Figure 2a. from the Austraits paper (https://doi.org/10.1038/s41597-021-01006-6)
@@ -279,10 +303,7 @@ We want to plot the coverage of traits by taxa, i.e. for how many traits are dat
 
 ```
 
-3. What traits have the widest coverage, i.e. most taxa?
-
-
-4. The austraits package also enables some plotting, e.g.
+3. The austraits package also enables some plotting, e.g.
 
 ```{r}
 plot_trait_distribution_beeswarm(austraits, "leaf_area", "dataset_id")
