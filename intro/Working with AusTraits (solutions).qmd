@@ -52,7 +52,7 @@ You can access the data from AusTraits in either of two ways:
 1. Use the package [austraits](https://github.com/traitecoevo/austraits) to download the data directly from the web. This is the easiest way to get started.
 
 ```{r}
-austraits <- load_austraits(version = "4.1.0", path = "intro/downloads")
+austraits <- load_austraits(version = "4.1.0", path = "downloads")
 ```
 
 2. Manually download the data to your computer from <https://zenodo.org/record/7583087/files/austraits-4.1.0.rds?download=1> and save it in the folder `downloads` in this project, then read it in using
@@ -433,6 +433,7 @@ Now let's pivot the data from long to wide format.
 ```{r}
 data %>% 
   select(taxon_name, trait_name, value) %>% 
+  mutate(value = as.numeric(value)) %>% 
   pivot_wider(names_from = trait_name, values_from = value)
 ```
 
