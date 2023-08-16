@@ -11,7 +11,7 @@ The goals of this practical are to:
 
 1. Get hands on experience with AusTraits, as an example of a big-data resource on traits of biological organisms,
 2. Refresh, extend, and practice your skills in data manipulation and visualisation, using R and the tidyverse packages, and
-3. Learn some fancy tricks when working with tables of data: joining relational tables, pivotting tables, and nesting tables
+3. Learn some fancy tricks when working with tables of data: joining relational tables, pivoting tables, and nesting tables
 
 As background, we suggest reading the paper describing AusTraits:
 
@@ -301,6 +301,44 @@ We want to plot the coverage of traits by taxa, i.e. for how many traits are dat
 
 ```{r}
 
+data <- austraits$traits #get data
+
+data %>%
+  #create new data set with listed variables
+  select(taxon_name, trait_name) %>%
+  # splits by both taxon name and then trait name
+  data_count <-
+    data %>%
+    group_by(taxon_name, trait_name) %>%
+    summarise(
+      n=n()
+    ) %>% 
+  ungroup()
+
+data_full <- 
+  expand_grid(
+    taxon_name = data$taxon_name %>% unique() %>% sample(2000),
+    trait_name = data$trait_name %>% unique()
+  )
+
+data_coverage <- 
+  data_full %>% 
+  left_join(data_count) %>% 
+  mutate(trait_presence = ifelse(is.na(n), 0, 1))
+
+# Make the plot
+data_coverage %>% 
+  mutate(
+    #reorder categorical variables by rank in coverage
+    trait_name = forcats::fct_reorder(trait_name, trait_presence, sum, .desc = T), 
+    taxon_name = forcats::fct_reorder(taxon_name, trait_presence, sum, .desc = T)
+  ) %>%
+  ggplot(aes(trait_name, taxon_name, fill = as.character(trait_presence))) +
+  geom_tile(show.legend = F) + 
+  theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank()
+  )
 ```
 
 3. The austraits package also enables some plotting, e.g.
@@ -312,7 +350,7 @@ plot_trait_distribution_beeswarm(austraits, "leaf_area", "dataset_id")
 You can change 
 
 - the second argument to specific traits
-- the thrid argument to be family 
+- the third argument to be family 
 
 # Some fancy tricks
 
@@ -383,7 +421,7 @@ Large databases often come in `long format`, where each row is a single observat
 
 The `pivot_wider` function from the `tidyr` package allows you to reshape a dataset from long to wide format. Let's try it out. For this exercise let's use a subset of the data, e.g. the data with id `Falster_2005_1` (check out the paper here <https://doi.org/10.1111/j.0022-0477.2005.00992.x>) 
 
-Challenge: Use the filter function to create a subset of the traits column with only the data from the paper `Falster_2005_1`. Also remove the records with trait_name of `huber_value` as it contains some dome duplicate records which make pivotting harder.
+Challenge: Use the filter function to create a subset of the traits column with only the data from the paper `Falster_2005_1`. Also remove the records with trait_name of `huber_value` as it contains some dome duplicate records which make pivoting harder.
 
 ```{r}
 data <- austraits$traits %>% 
